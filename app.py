@@ -50,8 +50,8 @@ class SaveReportRequest(BaseModel):
     url: str
     data: dict
 
-# IMPORTANT: Set your OpenAI API key here or in an .env file
-os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY", "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")
+# IMPORTANT: Set your OpenAI API key in your environment variables
+os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY", "")
 
 # Define the expected JSON format for the AI to output natively
 JSON_SCHEMA_PROMPT = """
@@ -81,7 +81,9 @@ async def analyze_url(req: AnalyzeRequest):
 
     try:
         # Use an LLM for the Agent
-        api_key = os.environ.get("OPENAI_API_KEY", "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")
+        api_key = os.environ.get("OPENAI_API_KEY")
+        if not api_key:
+            raise HTTPException(status_code=500, detail="OPENAI_API_KEY not configured on server")
         if api_key.startswith("sk-or"):
             # Use the new CrewAI LLM wrapper for OpenRouter compatibility in v1.x
             llm = LLM(
@@ -209,4 +211,5 @@ async def get_report_by_id(item_id: str):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("app:app", host="0.0.0.0", port=port, reload=True)
