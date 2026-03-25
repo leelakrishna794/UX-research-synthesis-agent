@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+crewai
+langchain-openai
+duckduckgo-search
+pydantic
+python-multipart
+python-dotenv
+mangum
